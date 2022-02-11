@@ -8,7 +8,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <Head>
-        <title>Popdynio</title>
+        <title>&#9899; Popdynio</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header>
