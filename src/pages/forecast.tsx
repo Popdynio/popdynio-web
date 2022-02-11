@@ -16,32 +16,69 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 import { Line } from 'react-chartjs-2'
 import PopulationCard from '../components/PopulationCard'
 import { PopulationCardProps } from '../components/PopulationCard/PopulationCard'
+import * as api from '../api'
 
-const Simulation: NextPage = () => {
+const Forecast: NextPage = () => {
   const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
+  const [S, setS] = React.useState([])
+  const [I, setI] = React.useState([])
+  const [R, setR] = React.useState([])
   const data = {
     labels,
     datasets: [
       {
         label: 'Susceptibles',
-        data: labels.map(() => Math.random() * 1000),
+        data: S,
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)'
       },
       {
         label: 'Infectados',
-        data: labels.map(() => Math.random() * 1000),
+        data: I,
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)'
       },
       {
         label: 'Recuperados',
-        data: labels.map(() => Math.random() * 1000),
+        data: R,
         borderColor: 'rgb(150, 62, 25)',
         backgroundColor: 'rgba(100, 88, 0, 0.5)'
       }
     ]
   }
+
+  React.useEffect(() => {
+    api
+      .forecast({
+        ids: ['S', 'I', 'R'],
+        initial_population: [10, 2, 0],
+        forecast_time: 100,
+        transitions: [
+          {
+            source: 'S',
+            dest: 'I',
+            alpha: 1,
+            beta: 0.0561215,
+            factors: ['S', 'I'],
+            includes_n: false
+          },
+          {
+            source: 'I',
+            dest: 'R',
+            alpha: 1,
+            beta: 0.0455331,
+            factors: ['I'],
+            includes_n: true
+          }
+        ]
+      })
+      .then(response => {
+        console.log(response.data)
+        setS(response.data.forecast.S)
+        setI(response.data.forecast.I)
+        setR(response.data.forecast.R)
+      })
+  }, [])
 
   const [cards, setCards] = React.useState<Partial<PopulationCardProps>[]>([{ name: 'P-1' }])
 
@@ -104,4 +141,4 @@ const Simulation: NextPage = () => {
   )
 }
 
-export default Simulation
+export default Forecast

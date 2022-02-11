@@ -25,11 +25,11 @@ const Navbar: React.FC<NavbarProps> = () => {
     }
   ]
 
-  const newSimulationLink = (
-    <Link href="/simulation">
+  const newForecastLink = (
+    <Link href="/forecast">
       <a className="relative inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
         <PlusSmIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-        <span>New Simulation</span>
+        <span>New forecast</span>
       </a>
     </Link>
   )
@@ -74,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                 </div>
               </div>
               <div className="flex items-center">
-                <div className="flex-shrink-0">{newSimulationLink}</div>
+                <div className="flex-shrink-0">{newForecastLink}</div>
               </div>
             </div>
           </div>
