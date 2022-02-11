@@ -2,7 +2,6 @@ import * as React from 'react'
 import { NextPage } from 'next'
 import Layout from '../layouts'
 import { PlusSmIcon, RefreshIcon } from '@heroicons/react/solid'
-import { Transition } from '@headlessui/react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,40 +14,8 @@ import {
 } from 'chart.js'
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 import { Line } from 'react-chartjs-2'
-
-export type Card = {
-  name: string
-  onChangeName: (ev: React.ChangeEvent<HTMLInputElement>) => void
-}
-
-const Card: React.FC<Card> = ({ name, onChangeName }) => {
-  return (
-    <Transition
-      show
-      appear
-      enter="transition-opacity duration-300"
-      enterFrom="opacity-0"
-      enterTo="opacity-100"
-      leave="transition-opacity duration-150"
-      leaveFrom="opacity-100"
-      leaveTo="opacity-0">
-      <div className="w-full shadow-sm">
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Name
-        </label>
-        <div className="mt-1">
-          <input
-            type="text"
-            name="name"
-            value={name}
-            onChange={onChangeName}
-            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md focus:outline-none"
-          />
-        </div>
-      </div>
-    </Transition>
-  )
-}
+import PopulationCard from '../components/PopulationCard'
+import { PopulationCardProps } from '../components/PopulationCard/PopulationCard'
 
 const Simulation: NextPage = () => {
   const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
@@ -75,32 +42,12 @@ const Simulation: NextPage = () => {
       }
     ]
   }
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const
-      },
-      title: {
-        display: true,
-        text: 'Chart.js Line Chart'
-      }
-    }
-  }
 
-  const [cards, setCards] = React.useState<Partial<Card>[]>([
-    {
-      name: 'P-1'
-    }
-  ])
+  const [cards, setCards] = React.useState<Partial<PopulationCardProps>[]>([{ name: 'P-1' }])
 
-  const handleAddEmptyCard = () => {
-    setCards([...cards, { name: `P-${cards.length + 1}` }])
-  }
+  const handleAddEmptyCard = () => setCards([...cards, { name: `P-${cards.length + 1}` }])
 
-  const handleRefreshCards = () => {
-    setCards([{ name: 'P-1' }])
-  }
+  const handleRefreshCards = () => setCards([{ name: 'P-1' }])
 
   const handleChangeCardName = (index: number) => (ev: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = ev.target
@@ -113,9 +60,9 @@ const Simulation: NextPage = () => {
   const inputSide = (
     <div className="w-full md:w-1/2">
       <div className="w-full flex flex-col justify-center items-center">
-        <div className="w-full px-20 flex flex-col gap-10">
+        <div className="w-full px-10 flex flex-col gap-10">
           {cards.map((card, i) => (
-            <Card key={`card-${i}`} name={card.name} onChangeName={handleChangeCardName(i)} />
+            <PopulationCard key={`card-${i}`} name={card.name} onChangeName={handleChangeCardName(i)} />
           ))}
         </div>
         <div className="mt-10">
@@ -149,7 +96,7 @@ const Simulation: NextPage = () => {
           onClick={handleRefreshCards}
         />
       </h1>
-      <div className="md:flex h-48 md:gap-5 mt-20">
+      <div className="md:flex md:gap-5 mt-20">
         {inputSide}
         {resultsSide}
       </div>
