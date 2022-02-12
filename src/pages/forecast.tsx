@@ -23,61 +23,6 @@ import PopulationTransition, {
 import { Transition } from '../api'
 
 const Forecast: NextPage = () => {
-  const labels = [0, 1, 2]
-  const [S, setS] = React.useState([])
-  const [I, setI] = React.useState([])
-  const [R, setR] = React.useState([])
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Susceptibles',
-        data: S
-      },
-      {
-        label: 'Infectados',
-        data: I
-      },
-      {
-        label: 'Recuperados',
-        data: R
-      }
-    ]
-  }
-
-  React.useEffect(() => {
-    api
-      .forecast({
-        ids: ['S', 'I', 'R'],
-        initial_population: [10, 2, 0],
-        forecast_time: 100,
-        transitions: [
-          {
-            source: 'S',
-            dest: 'I',
-            alpha: 1,
-            beta: 0.0561215,
-            factors: ['S', 'I'],
-            includes_n: false
-          },
-          {
-            source: 'I',
-            dest: 'R',
-            alpha: 1,
-            beta: 0.0455331,
-            factors: ['I'],
-            includes_n: true
-          }
-        ]
-      })
-      .then(response => {
-        console.log(response.data)
-        setS(response.data.forecast.S)
-        setI(response.data.forecast.I)
-        setR(response.data.forecast.R)
-      })
-  }, [])
-
   const [transitions, setTransitions] = React.useState<Partial<PopulationTransitionProps>[]>([])
   const [lastGroupIndex, setLastGroupIndex] = React.useState(1)
   const [groups, setGroups] = React.useState<Partial<PopulationCardProps>[]>([{ name: `P-${lastGroupIndex}` }])
@@ -92,14 +37,14 @@ const Forecast: NextPage = () => {
         beta: parseFloat(t.beta.toString()),
         source: t.source,
         dest: t.dest,
-        factors: t.factors,
-        includes_n: t.includesN
+        factors: t.factors || [],
+        includes_n: t.includesN || false
       } as Transition
     })
     api
       .forecast({
         ids: groups.map(group => group.name),
-        forecast_time: time * 10,
+        forecast_time: time * 5,
         transitions: mappedTransitions,
         initial_population: initialPopulation
       })
@@ -284,7 +229,7 @@ const Forecast: NextPage = () => {
     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 space-y-10 space-x-10">
       <div className="mt-20">
         <label htmlFor="range" className="font-bold text-gray-600">
-          Time: {time * 10}
+          Time: {time * 5}
         </label>
         <input
           type="range"
