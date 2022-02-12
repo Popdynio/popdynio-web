@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Navbar />
       </header>
       <main>
-        <div className="p-10">{children}</div>
+        <div className="px-4 py-10 md:p-10">{children}</div>
       </main>
     </>
   )
