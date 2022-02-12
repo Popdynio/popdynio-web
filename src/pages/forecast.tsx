@@ -20,6 +20,7 @@ import * as api from '../api'
 import PopulationTransition, {
   PopulationTransitionProps
 } from '../components/PopulationTransition/PopulationTransition'
+import Spinner from '../components/Spinner'
 import { Transition } from '../api'
 
 const Forecast: NextPage = () => {
@@ -29,8 +30,10 @@ const Forecast: NextPage = () => {
   const [initialPopulation, setInitialPopulation] = React.useState([100])
   const [time, setTime] = React.useState(100)
   const [plotData, setPlotData] = React.useState<Object>(null)
+  const [loading, setLoading] = React.useState(false)
 
   const handleRun = () => {
+    setLoading(true)
     const mappedTransitions = transitions.map(t => {
       return {
         alpha: parseFloat(t.alpha.toString()),
@@ -49,6 +52,7 @@ const Forecast: NextPage = () => {
         initial_population: initialPopulation
       })
       .then(response => {
+        setLoading(false)
         const newDatasets = []
         groups.forEach(group => {
           const randomColor = Math.floor(Math.random() * 16777215).toString(16)
@@ -64,6 +68,10 @@ const Forecast: NextPage = () => {
           datasets: newDatasets
         }
         setPlotData(newData)
+      })
+      .catch(err => {
+        console.error(err)
+        setLoading(false)
       })
   }
 
@@ -256,10 +264,16 @@ const Forecast: NextPage = () => {
     </div>
   )
 
+  const loadingState = (
+    <div className="w-full h-96 flex items-center justify-center">
+      <Spinner />
+    </div>
+  )
+
   const resultsSide = (
     <div className="w-full">
       <div className="">
-        <div className="w-full">{plotData && <Line data={plotData as any} />}</div>
+        {loading ? loadingState : <div className="w-full">{plotData && <Line data={plotData as any} />}</div>}
       </div>
     </div>
   )
