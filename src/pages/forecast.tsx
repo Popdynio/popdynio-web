@@ -99,7 +99,7 @@ const Forecast: NextPage = () => {
     api
       .forecast({
         ids: groups.map(group => group.name),
-        forecast_time: time * 100,
+        forecast_time: time * 10,
         transitions: mappedTransitions,
         initial_population: initialPopulation
       })
@@ -115,7 +115,7 @@ const Forecast: NextPage = () => {
           })
         })
         const newData = {
-          labels: groups.map(group => group.name),
+          labels: response.data.time,
           datasets: newDatasets
         }
         setPlotData(newData)
@@ -284,7 +284,7 @@ const Forecast: NextPage = () => {
     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 space-y-10 space-x-10">
       <div className="mt-20">
         <label htmlFor="range" className="font-bold text-gray-600">
-          Time: {time * 100}
+          Time: {time * 10}
         </label>
         <input
           type="range"
