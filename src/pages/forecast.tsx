@@ -22,36 +22,37 @@ import PopulationTransition, {
   PopulationTransitionProps
 } from '../components/PopulationTransition/PopulationTransition'
 import Spinner from '../components/Spinner'
-import { Transition } from '../api'
+import { Transition, SolverMethod } from '../api'
 import Select from '../components/Select'
 import Option from '../components/Option'
 import Toast from '../components/Toast'
 import { Transition as HeadlessUiTransition } from '@headlessui/react'
 import { TutorialTypes } from '../components/TutorialQuickView/TutorialQuickView'
 import TutorialQuickView from '../components/TutorialQuickView'
+import { colors } from '../styles/color.palette'
 
 const Forecast: NextPage = () => {
   const [transitions, setTransitions] = React.useState<Partial<PopulationTransitionProps>[]>([])
   const [lastGroupIndex, setLastGroupIndex] = React.useState(1)
-  const [groups, setGroups] = React.useState<Partial<PopulationCardProps>[]>([{ name: `P-${lastGroupIndex}` }])
+  const [groups, setGroups] = React.useState<Partial<PopulationCardProps>[]>([{ name: `P${lastGroupIndex}` }])
   const [initialPopulation, setInitialPopulation] = React.useState([100])
   const [time, setTime] = React.useState(100)
   const [plotData, setPlotData] = React.useState<Object>(null)
   const [loading, setLoading] = React.useState(false)
-  const [solverMethod, setSolverMethod] = React.useState<'ode' | 'stochastic'>('ode')
+  const [solverMethod, setSolverMethod] = React.useState<SolverMethod>('ODE')
   const [notification, setNotification] = React.useState<{
     type: 'error' | 'success'
     title: string
     message: string
   }>(null)
   const [openTutorialModal, setOpenTutorialModal] = React.useState<TutorialTypes>(null)
+  const [steps, setSteps] = React.useState(1)
 
   const handleRun = () => {
     setLoading(true)
     const mappedTransitions = transitions.map(t => {
       return {
         alpha: parseFloat(t.alpha.toString()),
-        beta: parseFloat(t.beta.toString()),
         source: t.source,
         dest: t.dest,
         factors: t.factors || [],
@@ -61,20 +62,24 @@ const Forecast: NextPage = () => {
     api
       .forecast({
         ids: groups.map(group => group.name),
-        forecast_time: time * 5,
+        forecast_time: time * 10,
         transitions: mappedTransitions,
         initial_population: initialPopulation,
-        method: solverMethod
+        method: solverMethod,
+        cut_every: steps
       })
       .then(response => {
         setLoading(false)
         const newDatasets = []
-        groups.forEach(group => {
-          const randomColor = Math.floor(Math.random() * 16777215).toString(16)
+        groups.forEach((group, i) => {
+          let randomColor = colors[i]
+          if (!randomColor) {
+            randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16)
+          }
           newDatasets.push({
             label: group.name,
             data: response.data.forecast[group.name],
-            borderColor: '#' + randomColor
+            borderColor: randomColor
           })
         })
         const newData = {
@@ -84,25 +89,25 @@ const Forecast: NextPage = () => {
         setPlotData(newData)
       })
       .catch(err => {
-        console.error(err)
+        console.error(err?.message)
         setNotification({
           type: 'error',
           title: 'Ups!',
-          message: 'There was an error with the API'
+          message: err?.response?.data?.detail || 'There was an error with the API'
         })
         setLoading(false)
       })
   }
 
   const handleRefresh = () => {
-    setGroups([{ name: 'P-1' }])
+    setGroups([{ name: 'P1' }])
     setLastGroupIndex(1)
     setTransitions([])
     setInitialPopulation([100])
   }
 
   const handleAddEmptyGroup = () => {
-    setGroups([...groups, { name: `P-${lastGroupIndex + 1}` }])
+    setGroups([...groups, { name: `P${lastGroupIndex + 1}` }])
     setLastGroupIndex(lastGroupIndex + 1)
     setInitialPopulation(initialPopulation.concat([100]))
   }
@@ -133,7 +138,7 @@ const Forecast: NextPage = () => {
     }
     if (['source', 'dest'].includes(field)) {
       return (newVal: string | number) => setField(field, newVal)
-    } else if (['alpha', 'beta'].includes(field)) {
+    } else if (field === 'alpha') {
       return (ev: React.ChangeEvent<HTMLInputElement>) => setField(field, ev.target.value)
     }
   }
@@ -187,7 +192,7 @@ const Forecast: NextPage = () => {
         <div className="text-4xl font-semibold text-gray-700 text-left">Groups</div>
         <div className="mt-4 w-full flex flex-col gap-1 divide-y h-96 overflow-y-scroll border rounded-md border-gray-100">
           {groups.map((card, i) => (
-            <div key={`card-${i}`} className="px-3 md:px-0">
+            <div key={`group-card-${i}`} className="px-3 md:px-0">
               <PopulationCard
                 name={card.name}
                 onChangeName={handleChangeGroupName(i)}
@@ -226,16 +231,14 @@ const Forecast: NextPage = () => {
         <div className="mt-4 w-full grid grid-cols-1 divide-y h-96 overflow-y-scroll border border-gray-100">
           {transitions.map((transition, i) => (
             <PopulationTransition
-              key={`card-${i}`}
+              key={`transition-card-${i}`}
               groups={groups.map(group => group.name)}
               source={transition.source}
               dest={transition.dest}
               factors={transition.factors}
               includesN={transition.includesN}
               alpha={transition.alpha}
-              beta={transition.beta}
               onChangeAlpha={handleChangeTransition(i, 'alpha') as any}
-              onChangeBeta={handleChangeTransition(i, 'beta') as any}
               onChangeSource={handleChangeTransition(i, 'source') as any}
               onChangeDest={handleChangeTransition(i, 'dest') as any}
               onToggleIncludesN={handleChangeTransition(i, 'includesN') as any}
@@ -256,24 +259,32 @@ const Forecast: NextPage = () => {
       </div>
     </HeadlessUiTransition>
   )
+
   const initialPopulationComponent = (
     <div>
-      <h1 className="text-center text-4xl font-semibold text-gray-700">Initial population</h1>
+      <div className="relative mb-4">
+        <h1 className="text-center text-4xl font-semibold text-gray-700">Initial population</h1>
+        <div className="absolute right-5 top-3">
+          <InformationCircleIcon
+            className="h-7 w-7 text-blue-700 rounded-full cursor-pointer hover:bg-blue-50 transition duration-500"
+            onClick={() => setOpenTutorialModal('initialPopulation')}
+          />
+        </div>
+      </div>
       <div className="flex flex-col gap-2 h-56 border p-2 rounded-lg overflow-y-scroll">
         {initialPopulation.map((pop, i) => (
-          <>
+          <div key={`initial-population-${i}`}>
             <label htmlFor={`initial-population-${i}`} className="text-gray-700 font-medium text-sm">
               {groups[i].name}
             </label>
             <input
-              key={`initial-population-${i}`}
               className="w-2/3 shadow-sm h-8 focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md focus:outline-none font-bold text-gray-700"
               name={`initial-population-${i}`}
               value={pop}
               onChange={handleChangeInitialPopulation(i)}
               type="number"
             />
-          </>
+          </div>
         ))}
       </div>
     </div>
@@ -282,17 +293,29 @@ const Forecast: NextPage = () => {
   const timeAndRunComponent = (
     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 space-y-10 space-x-10">
       <div className="mt-4 flex flex-col gap-4">
-        <div className="w-40">
-          <Select
-            label="Solver"
-            value={solverMethod || ''}
-            onChange={newVal => setSolverMethod(newVal as 'ode' | 'stochastic')}>
-            <Option value="ode" />
-            <Option value="stochastic" />
-          </Select>
+        <div className="flex gap-10 items-center">
+          <div className="w-40">
+            <Select
+              label="Solver"
+              value={solverMethod || ''}
+              onChange={newVal => setSolverMethod(newVal as SolverMethod)}>
+              <Option value="ODE" />
+              <Option value="Gillespie" />
+              <Option value="TauLeaping" />
+            </Select>
+          </div>
+          <div className="w-40">
+            <Select label="Steps" value={steps || ''} onChange={newVal => setSteps(parseInt(newVal.toString()))}>
+              <Option value="1" />
+              <Option value="5" />
+              <Option value="10" />
+              <Option value="25" />
+              <Option value="50" />
+            </Select>
+          </div>
         </div>
         <label htmlFor="range" className="font-bold text-gray-600">
-          Time: {time * 5}
+          Time: {time * 10}
         </label>
         <input
           type="range"

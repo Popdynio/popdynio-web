@@ -10,12 +10,10 @@ export type PopulationTransitionProps = {
   source: string
   dest: string
   alpha: number
-  beta: number
   factors: string[]
   includesN: boolean
   groups: string[]
   onChangeAlpha: (ev: React.ChangeEvent<HTMLInputElement>) => void
-  onChangeBeta: (ev: React.ChangeEvent<HTMLInputElement>) => void
   onToggleIncludesN: () => void
   onChangeSource: (newSource: string) => void
   onChangeDest: (newDest: string) => void
@@ -33,10 +31,8 @@ const classes = classnames.bind({
 const PopulationTransition: React.FC<PopulationTransitionProps> = props => {
   let {
     alpha,
-    beta,
     includesN,
     onChangeAlpha,
-    onChangeBeta,
     onChangeSource,
     onChangeDest,
     onAddFactor,
@@ -79,26 +75,16 @@ const PopulationTransition: React.FC<PopulationTransitionProps> = props => {
               className={classes('textInput')}
             />
           </div>
-          <div className="items-center gap-4 text-gray-700 font-medium text-sm">
-            <label htmlFor="beta">beta</label>
-            <input
-              name="beta"
-              type="text"
-              value={beta || ''}
-              onChange={onChangeBeta}
-              className={classes('textInput')}
-            />
-          </div>
         </div>
         <div className="mt-3 flex gap-4">
           <div className="w-full">
             <Select label="From" value={source || 'Empty'} onChange={onChangeSource}>
-              {groups.map((group, i) => group !== dest && <Option key={`option-${i}-${group}`} value={group} />)}
+              {groups.map((group, i) => group !== dest && <Option key={`source-option-${i}-${group}`} value={group} />)}
             </Select>
           </div>
           <div className="w-full">
             <Select label="Dest" value={dest || 'Empty'} onChange={onChangeDest}>
-              {groups.map((group, i) => group !== source && <Option key={`option-${i}-${group}`} value={group} />)}
+              {groups.map((group, i) => group !== source && <Option key={`dest-option-${i}-${group}`} value={group} />)}
             </Select>
           </div>
         </div>

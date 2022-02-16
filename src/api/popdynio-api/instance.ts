@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-console.log(process.env.POPDYNIO_API_URL)
-
 const axiosInstance = axios.create({
   baseURL: process.env.POPDYNIO_API_URL,
   timeout: 10000,
