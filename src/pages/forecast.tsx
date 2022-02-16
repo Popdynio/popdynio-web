@@ -263,7 +263,7 @@ const Forecast: NextPage = () => {
   const initialPopulationComponent = (
     <div>
       <div className="relative mb-4">
-        <h1 className="text-center text-4xl font-semibold text-gray-700">Initial population</h1>
+        <h1 className="text-left text-4xl font-semibold text-gray-700">Initial population</h1>
         <div className="absolute right-5 top-3">
           <InformationCircleIcon
             className="h-7 w-7 text-blue-700 rounded-full cursor-pointer hover:bg-blue-50 transition duration-500"
