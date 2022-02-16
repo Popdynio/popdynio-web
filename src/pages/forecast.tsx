@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { NextPage } from 'next'
 import Layout from '../layouts'
-import { PlusSmIcon, RefreshIcon } from '@heroicons/react/solid'
+import { PlusSmIcon, ChevronRightIcon } from '@heroicons/react/solid'
+import { InformationCircleIcon, RefreshIcon } from '@heroicons/react/outline'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,6 +25,10 @@ import Spinner from '../components/Spinner'
 import { Transition } from '../api'
 import Select from '../components/Select'
 import Option from '../components/Option'
+import Toast from '../components/Toast'
+import { Transition as HeadlessUiTransition } from '@headlessui/react'
+import { TutorialTypes } from '../components/TutorialQuickView/TutorialQuickView'
+import TutorialQuickView from '../components/TutorialQuickView'
 
 const Forecast: NextPage = () => {
   const [transitions, setTransitions] = React.useState<Partial<PopulationTransitionProps>[]>([])
@@ -34,6 +39,12 @@ const Forecast: NextPage = () => {
   const [plotData, setPlotData] = React.useState<Object>(null)
   const [loading, setLoading] = React.useState(false)
   const [solverMethod, setSolverMethod] = React.useState<'ode' | 'stochastic'>('ode')
+  const [notification, setNotification] = React.useState<{
+    type: 'error' | 'success'
+    title: string
+    message: string
+  }>(null)
+  const [openTutorialModal, setOpenTutorialModal] = React.useState<TutorialTypes>(null)
 
   const handleRun = () => {
     setLoading(true)
@@ -74,6 +85,11 @@ const Forecast: NextPage = () => {
       })
       .catch(err => {
         console.error(err)
+        setNotification({
+          type: 'error',
+          title: 'Ups!',
+          message: 'There was an error with the API'
+        })
         setLoading(false)
       })
   }
@@ -155,68 +171,95 @@ const Forecast: NextPage = () => {
   }
 
   const groupsList = (
-    <div className="w-full flex flex-col justify-center items-center pt-2 border rounded-lg md:shadow-xl pb-10">
-      <div className="text-4xl font-semibold text-gray-700 text-left">Groups</div>
-      <div className="mt-4 w-full flex flex-col gap-1 divide-y h-96 overflow-y-scroll border rounded-md border-gray-100">
-        {groups.map((card, i) => (
-          <PopulationCard
-            key={`card-${i}`}
-            name={card.name}
-            onChangeName={handleChangeGroupName(i)}
-            onDelete={handleDeleteGroup(i)}
+    <HeadlessUiTransition
+      show
+      appear
+      enter="transform transition duration-500 delay-100"
+      enterFrom="translate-y-20 opacity-0"
+      enterTo="translate-y-0 opacity-100">
+      <div className="w-full flex flex-col justify-center items-center pt-2 border rounded-md md:shadow-xl pb-10 bg-white relative">
+        <div className="absolute right-5 top-5">
+          <InformationCircleIcon
+            className="h-7 w-7 text-blue-700 rounded-full cursor-pointer hover:bg-blue-50 transition duration-500"
+            onClick={() => setOpenTutorialModal('groups')}
           />
-        ))}
+        </div>
+        <div className="text-4xl font-semibold text-gray-700 text-left">Groups</div>
+        <div className="mt-4 w-full flex flex-col gap-1 divide-y h-96 overflow-y-scroll border rounded-md border-gray-100">
+          {groups.map((card, i) => (
+            <div key={`card-${i}`} className="px-3 md:px-0">
+              <PopulationCard
+                name={card.name}
+                onChangeName={handleChangeGroupName(i)}
+                onDelete={handleDeleteGroup(i)}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-10">
+          <button
+            className="rounded-3xl bg-indigo-600 shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 p-3 cursor-pointer transition duration-300 inline-flex items-center text-white"
+            onClick={handleAddEmptyGroup}>
+            <PlusSmIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+            <span>Add group</span>
+          </button>
+        </div>
       </div>
-      <div className="mt-10">
-        <button
-          className="rounded-3xl bg-indigo-600 shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 p-3 cursor-pointer transition duration-300 inline-flex items-center text-white"
-          onClick={handleAddEmptyGroup}>
-          <PlusSmIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-          <span>Add group</span>
-        </button>
-      </div>
-    </div>
+    </HeadlessUiTransition>
   )
 
   const transitionsList = (
-    <div className="w-full flex flex-col justify-center items-center pt-2 border rounded-lg md:shadow-xl pb-10">
-      <div className="text-4xl font-semibold text-gray-700 text-left">Transitions</div>
-      <div className="mt-4 w-full grid grid-cols-1 divide-y h-96 overflow-y-scroll border border-gray-100">
-        {transitions.map((transition, i) => (
-          <PopulationTransition
-            key={`card-${i}`}
-            groups={groups.map(group => group.name)}
-            source={transition.source}
-            dest={transition.dest}
-            factors={transition.factors}
-            includesN={transition.includesN}
-            alpha={transition.alpha}
-            beta={transition.beta}
-            onChangeAlpha={handleChangeTransition(i, 'alpha') as any}
-            onChangeBeta={handleChangeTransition(i, 'beta') as any}
-            onChangeSource={handleChangeTransition(i, 'source') as any}
-            onChangeDest={handleChangeTransition(i, 'dest') as any}
-            onToggleIncludesN={handleChangeTransition(i, 'includesN') as any}
-            onAddFactor={handleAddTransitionFactor(i)}
-            onRemoveFactor={handleRemoveTransitionFactor(i)}
-            onDelete={handleDeleteTransition(i)}
+    <HeadlessUiTransition
+      show
+      appear
+      enter="transform transition duration-700 delay-100"
+      enterFrom="translate-y-20 opacity-0"
+      enterTo="translate-y-0 opacity-100">
+      <div className="w-full flex flex-col justify-center items-center pt-2 border rounded-md md:shadow-xl pb-10 bg-white relative">
+        <div className="absolute right-5 top-5">
+          <InformationCircleIcon
+            className="h-7 w-7 text-blue-700 rounded-full cursor-pointer hover:bg-blue-50 transition duration-500"
+            onClick={() => setOpenTutorialModal('transitions')}
           />
-        ))}
+        </div>
+        <div className="text-4xl font-semibold text-gray-700 text-left">Transitions</div>
+        <div className="mt-4 w-full grid grid-cols-1 divide-y h-96 overflow-y-scroll border border-gray-100">
+          {transitions.map((transition, i) => (
+            <PopulationTransition
+              key={`card-${i}`}
+              groups={groups.map(group => group.name)}
+              source={transition.source}
+              dest={transition.dest}
+              factors={transition.factors}
+              includesN={transition.includesN}
+              alpha={transition.alpha}
+              beta={transition.beta}
+              onChangeAlpha={handleChangeTransition(i, 'alpha') as any}
+              onChangeBeta={handleChangeTransition(i, 'beta') as any}
+              onChangeSource={handleChangeTransition(i, 'source') as any}
+              onChangeDest={handleChangeTransition(i, 'dest') as any}
+              onToggleIncludesN={handleChangeTransition(i, 'includesN') as any}
+              onAddFactor={handleAddTransitionFactor(i)}
+              onRemoveFactor={handleRemoveTransitionFactor(i)}
+              onDelete={handleDeleteTransition(i)}
+            />
+          ))}
+        </div>
+        <div className="mt-10">
+          <button
+            className="rounded-3xl bg-indigo-600 shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 p-3 cursor-pointer transition duration-300 inline-flex items-center text-white"
+            onClick={handleAddEmptyTransition}>
+            <PlusSmIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+            <span>Add transition</span>
+          </button>
+        </div>
       </div>
-      <div className="mt-10">
-        <button
-          className="rounded-3xl bg-indigo-600 shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 p-3 cursor-pointer transition duration-300 inline-flex items-center text-white"
-          onClick={handleAddEmptyTransition}>
-          <PlusSmIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-          <span>Add transition</span>
-        </button>
-      </div>
-    </div>
+    </HeadlessUiTransition>
   )
   const initialPopulationComponent = (
     <div>
       <h1 className="text-center text-4xl font-semibold text-gray-700">Initial population</h1>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 h-56 border p-2 rounded-lg overflow-y-scroll">
         {initialPopulation.map((pop, i) => (
           <>
             <label htmlFor={`initial-population-${i}`} className="text-gray-700 font-medium text-sm">
@@ -261,9 +304,11 @@ const Forecast: NextPage = () => {
       </div>
       <div className="flex justify-end">
         <button
-          className="h-20 w-40 bg-green-400 rounded-2xl text-3xl text-white font-extrabold hover:outline-none"
+          className="h-20 w-40 bg-green-400 rounded-2xl text-3xl text-white font-extrabold hover:outline-none px-4 hover:bg-green-600 transition duration-300"
           onClick={handleRun}>
-          Run
+          <div className="flex items-center justify-center">
+            <ChevronRightIcon className="h-10 w-10" /> Run
+          </div>
         </button>
       </div>
     </div>
@@ -292,25 +337,39 @@ const Forecast: NextPage = () => {
 
   const header = (
     <div className="flex justify-between">
-      <h1 className="font-semibold text-2xl md:text-4xl flex items-center gap-10">
-        Please specify your input
-        <RefreshIcon
-          className="w-8 h-8 md:w-10 md:h-10 text-green-600 font-bold bg-green-50 rounded-full cursor-pointer"
-          onClick={handleRefresh}
-        />
+      <h1 className="font-semibold text-2xl md:text-4xl flex items-center gap-10 text-gray-200">
+        New forecast simulation
       </h1>
+      <RefreshIcon
+        className="w-8 h-8 md:w-10 md:h-10 text-green-600 font-bold bg-white rounded-full cursor-pointer transition duration-700 hover:transform hover:rotate-180"
+        onClick={handleRefresh}
+      />
     </div>
   )
 
   return (
     <Layout>
       {header}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-20 pb-10">
         {groupsList}
         {transitionsList}
         {forecastSettings}
         {resultsSide}
       </div>
+      {!!notification && (
+        <Toast
+          variant={notification.type}
+          title={notification.title}
+          message={notification.message}
+          show={true}
+          onClose={() => setNotification(null)}
+        />
+      )}
+      <TutorialQuickView
+        variant={openTutorialModal}
+        open={!!openTutorialModal}
+        onClose={() => setOpenTutorialModal(null)}
+      />
     </Layout>
   )
 }
