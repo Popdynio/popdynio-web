@@ -114,7 +114,7 @@ const PopulationTransition: React.FC<PopulationTransitionProps> = props => {
             N
           </label>
         </div>
-        <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mt-6">
+        <div className="grid grid-cols-4 md:grid-cols-6 gap-4 mt-6">
           {groups.map((group, i) => (
             <div key={`factor-${i}-${group}`}>
               <span
