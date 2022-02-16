@@ -22,6 +22,8 @@ import PopulationTransition, {
 } from '../components/PopulationTransition/PopulationTransition'
 import Spinner from '../components/Spinner'
 import { Transition } from '../api'
+import Select from '../components/Select'
+import Option from '../components/Option'
 
 const Forecast: NextPage = () => {
   const [transitions, setTransitions] = React.useState<Partial<PopulationTransitionProps>[]>([])
@@ -31,6 +33,7 @@ const Forecast: NextPage = () => {
   const [time, setTime] = React.useState(100)
   const [plotData, setPlotData] = React.useState<Object>(null)
   const [loading, setLoading] = React.useState(false)
+  const [solverMethod, setSolverMethod] = React.useState<'ode' | 'stochastic'>('ode')
 
   const handleRun = () => {
     setLoading(true)
@@ -49,7 +52,8 @@ const Forecast: NextPage = () => {
         ids: groups.map(group => group.name),
         forecast_time: time * 5,
         transitions: mappedTransitions,
-        initial_population: initialPopulation
+        initial_population: initialPopulation,
+        method: solverMethod
       })
       .then(response => {
         setLoading(false)
@@ -60,7 +64,6 @@ const Forecast: NextPage = () => {
             label: group.name,
             data: response.data.forecast[group.name],
             borderColor: '#' + randomColor
-            // backgroundColor: 'rgb(255, 100, 100)'
           })
         })
         const newData = {
@@ -152,9 +155,9 @@ const Forecast: NextPage = () => {
   }
 
   const groupsList = (
-    <div className="w-full flex flex-col justify-center items-center pt-2 rounded-lg md:shadow-xl pb-10">
+    <div className="w-full flex flex-col justify-center items-center pt-2 border rounded-lg md:shadow-xl pb-10">
       <div className="text-4xl font-semibold text-gray-700 text-left">Groups</div>
-      <div className="mt-4 w-full flex flex-col gap-1 divide-y h-96 overflow-y-scroll border border-gray-100">
+      <div className="mt-4 w-full flex flex-col gap-1 divide-y h-96 overflow-y-scroll border rounded-md border-gray-100">
         {groups.map((card, i) => (
           <PopulationCard
             key={`card-${i}`}
@@ -176,7 +179,7 @@ const Forecast: NextPage = () => {
   )
 
   const transitionsList = (
-    <div className="w-full flex flex-col justify-center items-center pt-2 rounded-lg md:shadow-xl pb-10">
+    <div className="w-full flex flex-col justify-center items-center pt-2 border rounded-lg md:shadow-xl pb-10">
       <div className="text-4xl font-semibold text-gray-700 text-left">Transitions</div>
       <div className="mt-4 w-full grid grid-cols-1 divide-y h-96 overflow-y-scroll border border-gray-100">
         {transitions.map((transition, i) => (
@@ -235,7 +238,16 @@ const Forecast: NextPage = () => {
 
   const timeAndRunComponent = (
     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 space-y-10 space-x-10">
-      <div className="mt-20">
+      <div className="mt-4 flex flex-col gap-4">
+        <div className="w-40">
+          <Select
+            label="Solver"
+            value={solverMethod || ''}
+            onChange={newVal => setSolverMethod(newVal as 'ode' | 'stochastic')}>
+            <Option value="ode" />
+            <Option value="stochastic" />
+          </Select>
+        </div>
         <label htmlFor="range" className="font-bold text-gray-600">
           Time: {time * 5}
         </label>
@@ -278,8 +290,8 @@ const Forecast: NextPage = () => {
     </div>
   )
 
-  return (
-    <Layout>
+  const header = (
+    <div className="flex justify-between">
       <h1 className="font-semibold text-2xl md:text-4xl flex items-center gap-10">
         Please specify your input
         <RefreshIcon
@@ -287,6 +299,12 @@ const Forecast: NextPage = () => {
           onClick={handleRefresh}
         />
       </h1>
+    </div>
+  )
+
+  return (
+    <Layout>
+      {header}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-20">
         {groupsList}
         {transitionsList}

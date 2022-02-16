@@ -14,6 +14,7 @@ export type ForecastRequest = {
   forecast_time: number
   initial_population: number[]
   transitions: Transition[]
+  method: 'ode' | 'stochastic'
 }
 
 export const forecast = (body: ForecastRequest) => popdynioInstance.post('/forecast', body)
