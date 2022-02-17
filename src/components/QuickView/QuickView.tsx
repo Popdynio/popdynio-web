@@ -5,8 +5,8 @@ import { XIcon } from '@heroicons/react/outline'
 export type QuickViewProps = {
   open?: boolean
   onClose: () => void
-  title: string
-  text: string
+  title: JSX.Element
+  text: JSX.Element
 }
 
 const QuickView: React.FC<QuickViewProps> = ({ open = false, onClose, title, text }) => {
@@ -40,7 +40,6 @@ const QuickView: React.FC<QuickViewProps> = ({ open = false, onClose, title, tex
                 <button
                   type="button"
                   className="absolute top-4 right-4 text-gray-400 hover:text-gray-500 sm:top-8 sm:right-6 md:top-6 md:right-6 lg:top-8 lg:right-8">
-                  <span className="sr-only">Close</span>
                   <XIcon className="h-6 w-6" aria-hidden="true" onClick={onClose} />
                 </button>
                 <div className="w-full">
