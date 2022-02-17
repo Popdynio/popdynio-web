@@ -369,10 +369,12 @@ const Forecast: NextPage = () => {
       <h1 className="font-semibold text-2xl md:text-4xl flex items-center gap-10 text-gray-200">
         New forecast simulation
       </h1>
-      <RefreshIcon
-        className="w-8 h-8 md:w-10 md:h-10 text-green-600 font-bold bg-white rounded-full cursor-pointer transition duration-700 hover:transform hover:rotate-180"
-        onClick={handleRefresh}
-      />
+      <button
+        className="w-40 flex justify-between items-center bg-white p-2 rounded-md shadow group hover:bg-gray-100 transition duration-200 focus:outline-none focus:border-none"
+        onClick={handleRefresh}>
+        <span className="text-gray-900 font-medium">Refresh</span>
+        <RefreshIcon className="w-6 h-6 md:w-8 md:h-8 text-green-600 font-bold rounded-full cursor-pointer transition duration-700 group-hover:transform group-hover:rotate-180" />
+      </button>
     </div>
   )
 
