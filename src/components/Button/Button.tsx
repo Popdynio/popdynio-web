@@ -17,7 +17,7 @@ export type ButtonProps = JSX.IntrinsicElements['button'] & {
   size?: 'small' | 'medium' | 'large' | 'huge'
 }
 
-const Button: FC<ButtonProps> = ({ color = 'primary', className, size = 'medium', onClick, children, ...props }) => (
+const Button: FC<ButtonProps> = ({ color = 'primary', className, size = 'medium', children, ...props }) => (
   <button type="button" className={classes('root', color, size, className)} {...props}>
     {children}
   </button>

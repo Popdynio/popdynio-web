@@ -30,6 +30,7 @@ import { Transition as HeadlessUiTransition } from '@headlessui/react'
 import { TutorialTypes } from '../components/TutorialQuickView/TutorialQuickView'
 import TutorialQuickView from '../components/TutorialQuickView'
 import { colors } from '../styles/color.palette'
+import DiffEquationButton from '../components/DiffEquationButton'
 
 const Forecast: NextPage = () => {
   const [transitions, setTransitions] = React.useState<Partial<PopulationTransitionProps>[]>([])
@@ -38,6 +39,7 @@ const Forecast: NextPage = () => {
   const [initialPopulation, setInitialPopulation] = React.useState([100])
   const [time, setTime] = React.useState(50)
   const [plotData, setPlotData] = React.useState<Object>(null)
+  const [diffEquation, setDiffEquation] = React.useState(null)
   const [loading, setLoading] = React.useState(false)
   const [solverMethod, setSolverMethod] = React.useState<SolverMethod>('ODE')
   const [notification, setNotification] = React.useState<{
@@ -85,6 +87,12 @@ const Forecast: NextPage = () => {
         const newData = {
           labels: response.data.time,
           datasets: newDatasets
+        }
+        if (response.data.diff_response) {
+          setDiffEquation({
+            ids: groups.map(group => group.name),
+            ...response.data.diff_response
+          })
         }
         setPlotData(newData)
       })
@@ -333,7 +341,7 @@ const Forecast: NextPage = () => {
       </div>
       <div className="flex justify-end">
         <button
-          className="h-20 w-40 bg-green-400 rounded-2xl text-3xl text-white font-extrabold hover:outline-none px-4 hover:bg-green-600 transition duration-300"
+          className="h-20 w-40 bg-green-400 rounded-2xl text-3xl text-white font-extrabold px-4 hover:bg-green-600 transition duration-300 focus:outline-none"
           onClick={handleRun}>
           <div className="flex items-center justify-center">
             <ChevronRightIcon className="h-10 w-10" /> Run
@@ -361,6 +369,9 @@ const Forecast: NextPage = () => {
       <div className="">
         {loading ? loadingState : <div className="w-full">{plotData && <Line data={plotData as any} />}</div>}
       </div>
+      <div className="mt-10 md:mt-20 flex justify-center">
+        {diffEquation && <DiffEquationButton diffEquation={diffEquation} />}
+      </div>
     </div>
   )
 
@@ -369,10 +380,12 @@ const Forecast: NextPage = () => {
       <h1 className="font-semibold text-2xl md:text-4xl flex items-center gap-10 text-gray-200">
         New forecast simulation
       </h1>
-      <RefreshIcon
-        className="w-8 h-8 md:w-10 md:h-10 text-green-600 font-bold bg-white rounded-full cursor-pointer transition duration-700 hover:transform hover:rotate-180"
-        onClick={handleRefresh}
-      />
+      <button
+        className="w-40 flex justify-between items-center bg-white p-2 rounded-md shadow group hover:bg-gray-100 transition duration-200 focus:outline-none focus:border-none"
+        onClick={handleRefresh}>
+        <span className="text-gray-900 font-medium">Refresh</span>
+        <RefreshIcon className="w-6 h-6 md:w-8 md:h-8 text-green-600 font-bold rounded-full cursor-pointer transition duration-700 group-hover:transform group-hover:rotate-180" />
+      </button>
     </div>
   )
 
