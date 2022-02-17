@@ -30,6 +30,7 @@ import { Transition as HeadlessUiTransition } from '@headlessui/react'
 import { TutorialTypes } from '../components/TutorialQuickView/TutorialQuickView'
 import TutorialQuickView from '../components/TutorialQuickView'
 import { colors } from '../styles/color.palette'
+import DiffEquationButton from '../components/DiffEquationButton'
 
 const Forecast: NextPage = () => {
   const [transitions, setTransitions] = React.useState<Partial<PopulationTransitionProps>[]>([])
@@ -38,6 +39,7 @@ const Forecast: NextPage = () => {
   const [initialPopulation, setInitialPopulation] = React.useState([100])
   const [time, setTime] = React.useState(50)
   const [plotData, setPlotData] = React.useState<Object>(null)
+  const [diffEquation, setDiffEquation] = React.useState(null)
   const [loading, setLoading] = React.useState(false)
   const [solverMethod, setSolverMethod] = React.useState<SolverMethod>('ODE')
   const [notification, setNotification] = React.useState<{
@@ -85,6 +87,12 @@ const Forecast: NextPage = () => {
         const newData = {
           labels: response.data.time,
           datasets: newDatasets
+        }
+        if (response.data.diff_response) {
+          setDiffEquation({
+            ids: groups.map(group => group.name),
+            ...response.data.diff_response
+          })
         }
         setPlotData(newData)
       })
@@ -360,6 +368,9 @@ const Forecast: NextPage = () => {
     <div className="w-full">
       <div className="">
         {loading ? loadingState : <div className="w-full">{plotData && <Line data={plotData as any} />}</div>}
+      </div>
+      <div className="mt-10 md:mt-20 flex justify-center">
+        {diffEquation && <DiffEquationButton diffEquation={diffEquation} />}
       </div>
     </div>
   )
