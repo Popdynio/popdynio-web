@@ -22,6 +22,7 @@ import { colors } from '../styles/color.palette'
 import { ChevronRightIcon } from '@heroicons/react/outline'
 import Toast from '../components/Toast'
 import Spinner from '../components/Spinner'
+import DiffEquationButton from '../components/DiffEquationButton'
 
 const ExamplesPage: NextPage = () => {
   const [example, setExample] = React.useState('sir')
@@ -30,6 +31,7 @@ const ExamplesPage: NextPage = () => {
   const [time, setTime] = React.useState(50)
   const [initialPopulation, setInitialPopulation] = React.useState([100, 100, 100])
   const [loading, setLoading] = React.useState(false)
+  const [diffEquation, setDiffEquation] = React.useState(null)
   const [plotData, setPlotData] = React.useState<Object>(null)
   const [notification, setNotification] = React.useState<{
     type: 'error' | 'success'
@@ -145,6 +147,12 @@ const ExamplesPage: NextPage = () => {
         const newData = {
           labels: response?.data?.time,
           datasets: newDatasets
+        }
+        if (response.data.diff_response) {
+          setDiffEquation({
+            ids: exampleData[example].request.ids,
+            ...response.data.diff_response
+          })
         }
         setPlotData(newData)
       })
@@ -262,7 +270,18 @@ const ExamplesPage: NextPage = () => {
   const result = (
     <div className="flex flex-col gap-10">
       <h2 className="text-2xl font-bold text-gray-700">{exampleData[example]?.title}</h2>
-      {loading ? loadingState : !!plotData && <Line data={plotData as any} />}
+      {loading
+        ? loadingState
+        : !!plotData && (
+            <>
+              <Line data={plotData as any} />
+              {diffEquation && (
+                <div className="flex justify-center">
+                  <DiffEquationButton diffEquation={diffEquation} />
+                </div>
+              )}
+            </>
+          )}
     </div>
   )
 

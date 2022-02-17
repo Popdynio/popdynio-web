@@ -23,19 +23,19 @@ const DiffEquationButton: React.FC<DiffEquationButtonProps> = ({ diffEquation })
       if (factors.length === 0 || factors.length === 1) {
         N = ''
       } else if (factors.length === 2) {
-        N = `$\\cdot \\frac{1}{N}$`
+        N = `\\cdot \\frac{1}{N}`
       } else {
-        N = `$\\cdot \\frac{1}{N^${factors.length - 1}}$`
+        N = `\\cdot \\frac{1}{N^${factors.length - 1}}`
       }
     }
-    return `${alpha} $\\cdot$ ${factors.join(' $\\cdot$ ')} ${N}`
+    return `\$${alpha} $$\\cdot$$ ${factors.join(' $$\\cdot$$ ')} ${N}\$`
   }
 
   const handleShowEquation = (group: string, inOuts) => {
     const ins = inOuts.in.map(factor => handleShowTransitionFactor(factor)).join(' + ')
     const outs = inOuts.out.map(factor => handleShowTransitionFactor(factor)).join(' + ')
 
-    const rightMember = ins + (outs.length > 0 ? ` $-$ (${outs})` : '')
+    const rightMember = ins + (outs.length > 0 ? ` $-$ ( ${outs} )` : '')
     const leftMember = `$\\frac{\\partial ${group}}{\\partial t}$`
 
     if (!ins.length && !outs.length) {
@@ -69,7 +69,7 @@ const DiffEquationButton: React.FC<DiffEquationButtonProps> = ({ diffEquation })
   const title = <span>ODEs System</span>
 
   const body = (
-    <div className="flex flex-col gap-4 text-lg md:text-xl text-left pl-0 md:pl-20">
+    <div className="flex flex-col gap-4 text-lg md:text-sm text-left pl-0 md:pl-20">
       {latexEquations.map((eq, i) => (
         <div className="flex gap-4" key={`equation-${i}`}>
           {handleParseLatexEquation(eq, i)}
