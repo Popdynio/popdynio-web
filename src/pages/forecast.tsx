@@ -52,7 +52,7 @@ const Forecast: NextPage = () => {
     setLoading(true)
     const mappedTransitions = transitions.map(t => {
       return {
-        alpha: parseFloat(t.alpha.toString()),
+        alpha: parseFloat(t?.alpha?.toString()),
         source: t.source,
         dest: t.dest,
         factors: t.factors || [],
@@ -95,6 +95,7 @@ const Forecast: NextPage = () => {
           title: 'Ups!',
           message: err?.response?.data?.detail || 'There was an error with the API'
         })
+        setPlotData(null)
         setLoading(false)
       })
   }
