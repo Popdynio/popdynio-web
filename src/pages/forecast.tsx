@@ -333,7 +333,7 @@ const Forecast: NextPage = () => {
       </div>
       <div className="flex justify-end">
         <button
-          className="h-20 w-40 bg-green-400 rounded-2xl text-3xl text-white font-extrabold hover:outline-none px-4 hover:bg-green-600 transition duration-300"
+          className="h-20 w-40 bg-green-400 rounded-2xl text-3xl text-white font-extrabold px-4 hover:bg-green-600 transition duration-300 focus:outline-none"
           onClick={handleRun}>
           <div className="flex items-center justify-center">
             <ChevronRightIcon className="h-10 w-10" /> Run
