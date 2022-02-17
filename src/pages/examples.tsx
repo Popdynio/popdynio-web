@@ -28,6 +28,7 @@ const ExamplesPage: NextPage = () => {
   const [steps, setSteps] = React.useState(5)
   const [solver, setSolver] = React.useState<SolverMethod>('ODE')
   const [time, setTime] = React.useState(50)
+  const [initialPopulation, setInitialPopulation] = React.useState([100, 100, 100])
   const [loading, setLoading] = React.useState(false)
   const [plotData, setPlotData] = React.useState<Object>(null)
   const [notification, setNotification] = React.useState<{
@@ -35,7 +36,6 @@ const ExamplesPage: NextPage = () => {
     title: string
     message: string
   }>(null)
-
   const exampleData = {
     sir: {
       title: 'SIR Model',
@@ -58,7 +58,7 @@ const ExamplesPage: NextPage = () => {
             includes_n: false
           }
         ],
-        initial_population: [100, 100, 100],
+        initial_population: initialPopulation,
         method: solver,
         cut_every: steps
       }
@@ -84,7 +84,7 @@ const ExamplesPage: NextPage = () => {
             includes_n: false
           }
         ],
-        initial_population: [100, 100, 100],
+        initial_population: initialPopulation,
         method: solver,
         cut_every: steps
       }
@@ -92,7 +92,7 @@ const ExamplesPage: NextPage = () => {
     another: {
       title: 'Another model',
       request: {
-        ids: ['S', 'I', 'R'],
+        ids: ['S', 'I', 'R', 'A'],
         forecast_time: time * 10,
         transitions: [
           {
@@ -108,9 +108,16 @@ const ExamplesPage: NextPage = () => {
             dest: 'R',
             factors: ['I'],
             includes_n: false
+          },
+          {
+            alpha: 0.3,
+            source: 'R',
+            dest: 'A',
+            factors: [],
+            includes_n: false
           }
         ],
-        initial_population: [100, 100, 100],
+        initial_population: initialPopulation,
         method: solver,
         cut_every: steps
       }
@@ -158,11 +165,22 @@ const ExamplesPage: NextPage = () => {
 
   const handleRun = () => fetchData()
 
+  const handleChangeExample = (newVal: string | number) => {
+    setExample(newVal as string)
+    setInitialPopulation(Array(exampleData[newVal].request.ids.length).fill(100))
+  }
+
+  const handleChangeInitialPopulation = (index: number) => (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const list = [...initialPopulation]
+    list[index] = parseInt(ev.target.value)
+    setInitialPopulation(list)
+  }
+
   const header = (
     <div className="flex justify-between">
       <h1 className="font-semibold text-2xl md:text-4xl text-gray-200">Examples</h1>
       <div className="w-60">
-        <Select label="" value={example} name={example} onChange={newVal => setExample(newVal as string)}>
+        <Select label="" value={example} name={example} onChange={handleChangeExample}>
           <Option value="sir">sir</Option>
           <Option value="seir">seir</Option>
           <Option value="another">another</Option>
@@ -173,6 +191,22 @@ const ExamplesPage: NextPage = () => {
 
   const inputFields = (
     <div className="mt-0 md:mt-20">
+      <div className="flex flex-col gap-2 h-56 border p-2 rounded-lg overflow-y-scroll mb-10">
+        {initialPopulation.map((pop, i) => (
+          <div key={`initial-population-${i}`}>
+            <label htmlFor={`initial-population-${i}`} className="text-gray-700 font-medium text-sm">
+              {exampleData[example].request.ids[i]}
+            </label>
+            <input
+              className="w-2/3 shadow-sm h-8 focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md focus:outline-none font-bold text-gray-700"
+              name={`initial-population-${i}`}
+              value={pop}
+              onChange={handleChangeInitialPopulation(i)}
+              type="number"
+            />
+          </div>
+        ))}
+      </div>
       <label htmlFor="range" className="font-bold text-gray-600">
         Time: {time * 10}
       </label>
