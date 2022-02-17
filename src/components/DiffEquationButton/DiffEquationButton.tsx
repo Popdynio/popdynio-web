@@ -28,7 +28,7 @@ const DiffEquationButton: React.FC<DiffEquationButtonProps> = ({ diffEquation })
         N = `\\cdot \\frac{1}{N^${factors.length - 1}}`
       }
     }
-    return `\$${alpha} $$\\cdot$$ ${factors.join(' $$\\cdot$$ ')} ${N}\$`
+    return `\$${alpha} $$${factors.length > 0 ? `\\cdot$$ ${factors.join(' $$\\cdot$$ ')}` : ''} ${N}\$`
   }
 
   const handleShowEquation = (group: string, inOuts) => {
