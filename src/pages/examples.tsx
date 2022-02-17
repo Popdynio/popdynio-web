@@ -25,9 +25,9 @@ import Spinner from '../components/Spinner'
 
 const ExamplesPage: NextPage = () => {
   const [example, setExample] = React.useState('sir')
-  const [steps, setSteps] = React.useState(1)
+  const [steps, setSteps] = React.useState(5)
   const [solver, setSolver] = React.useState<SolverMethod>('ODE')
-  const [time, setTime] = React.useState(100)
+  const [time, setTime] = React.useState(50)
   const [loading, setLoading] = React.useState(false)
   const [plotData, setPlotData] = React.useState<Object>(null)
   const [notification, setNotification] = React.useState<{
@@ -136,7 +136,7 @@ const ExamplesPage: NextPage = () => {
           })
         })
         const newData = {
-          labels: response.data.time,
+          labels: response?.data?.time,
           datasets: newDatasets
         }
         setPlotData(newData)
@@ -228,7 +228,7 @@ const ExamplesPage: NextPage = () => {
   const result = (
     <div className="flex flex-col gap-10">
       <h2 className="text-2xl font-bold text-gray-700">{exampleData[example]?.title}</h2>
-      {loading ? loadingState : <Line data={plotData as any} />}
+      {loading ? loadingState : !!plotData && <Line data={plotData as any} />}
     </div>
   )
 

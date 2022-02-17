@@ -36,7 +36,7 @@ const Forecast: NextPage = () => {
   const [lastGroupIndex, setLastGroupIndex] = React.useState(1)
   const [groups, setGroups] = React.useState<Partial<PopulationCardProps>[]>([{ name: `P${lastGroupIndex}` }])
   const [initialPopulation, setInitialPopulation] = React.useState([100])
-  const [time, setTime] = React.useState(100)
+  const [time, setTime] = React.useState(50)
   const [plotData, setPlotData] = React.useState<Object>(null)
   const [loading, setLoading] = React.useState(false)
   const [solverMethod, setSolverMethod] = React.useState<SolverMethod>('ODE')
@@ -46,7 +46,7 @@ const Forecast: NextPage = () => {
     message: string
   }>(null)
   const [openTutorialModal, setOpenTutorialModal] = React.useState<TutorialTypes>(null)
-  const [steps, setSteps] = React.useState(1)
+  const [steps, setSteps] = React.useState(5)
 
   const handleRun = () => {
     setLoading(true)
