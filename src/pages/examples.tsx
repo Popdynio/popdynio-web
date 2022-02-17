@@ -268,7 +268,7 @@ const ExamplesPage: NextPage = () => {
 
   return (
     <Layout>
-      <div className="h-screen">
+      <div className="">
         {header}
         <div className="mt-20">
           <div className="bg-white px-4 md:px-4 py-10 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-10">
