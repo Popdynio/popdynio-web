@@ -13,9 +13,11 @@ import {
 } from 'chart.js'
 import { ArchiveIcon, StarIcon, WifiIcon } from '@heroicons/react/solid'
 import Image from 'next/image'
-import { NewspaperIcon, PhoneIcon, PresentationChartBarIcon, SupportIcon } from '@heroicons/react/outline'
+import { PresentationChartBarIcon } from '@heroicons/react/outline'
 
 import bg1 from '../../public/bg1.png'
+import bg2 from '../../public/bg2.jpeg'
+import bg3 from '../../public/bg3.jpeg'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement)
 import Navbar from '../components/Navbar'
@@ -90,11 +92,9 @@ const Home: FC = () => {
           </main>
         </div>
         <div className="pt-10 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 z-0">
-          <img
-            className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
-            src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2850&q=80"
-            alt=""
-          />
+          <div className="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full">
+            <Image src={bg3} alt="" layout="fill" objectFit="cover" />
+          </div>
         </div>
       </div>
     </div>
@@ -174,11 +174,7 @@ const Home: FC = () => {
       {/* Header */}
       <div className="relative pb-32 bg-gray-800">
         <div className="absolute inset-0">
-          <img
-            className="w-full h-full object-cover"
-            src="https://images.unsplash.com/photo-1525130413817-d45c1d127c42?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1920&q=60&&sat=-100"
-            alt=""
-          />
+          <Image className="w-full h-full object-cover" layout="fill" objectFit="cover" src={bg2} alt="" />
           <div className="absolute inset-0 bg-gray-800 mix-blend-multiply" aria-hidden="true" />
         </div>
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
