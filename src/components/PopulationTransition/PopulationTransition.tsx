@@ -78,13 +78,27 @@ const PopulationTransition: React.FC<PopulationTransitionProps> = props => {
         </div>
         <div className="mt-3 flex gap-4">
           <div className="w-full">
-            <Select label="From" value={source || 'Empty'} onChange={onChangeSource}>
-              {groups.map((group, i) => group !== dest && <Option key={`source-option-${i}-${group}`} value={group} />)}
+            <Select label="From" name={source || 'Empty'} value={source || 'Empty'} onChange={onChangeSource}>
+              {groups.map(
+                (group, i) =>
+                  group !== dest && (
+                    <Option key={`source-option-${i}-${group}`} value={group}>
+                      {group}
+                    </Option>
+                  )
+              )}
             </Select>
           </div>
           <div className="w-full">
-            <Select label="Dest" value={dest || 'Empty'} onChange={onChangeDest}>
-              {groups.map((group, i) => group !== source && <Option key={`dest-option-${i}-${group}`} value={group} />)}
+            <Select label="Dest" name={dest || 'Empty'} value={dest || 'Empty'} onChange={onChangeDest}>
+              {groups.map(
+                (group, i) =>
+                  group !== source && (
+                    <Option key={`dest-option-${i}-${group}`} value={group}>
+                      {group}
+                    </Option>
+                  )
+              )}
             </Select>
           </div>
         </div>

@@ -298,20 +298,25 @@ const Forecast: NextPage = () => {
           <div className="w-40">
             <Select
               label="Solver"
+              name={solverMethod || ''}
               value={solverMethod || ''}
               onChange={newVal => setSolverMethod(newVal as SolverMethod)}>
-              <Option value="ODE" />
-              <Option value="Gillespie" />
-              <Option value="TauLeaping" />
+              <Option value="ODE">ODE</Option>
+              <Option value="Gillespie">Gillespie</Option>
+              <Option value="TauLeaping">TauLeaping</Option>
             </Select>
           </div>
           <div className="w-40">
-            <Select label="Steps" value={steps || ''} onChange={newVal => setSteps(parseInt(newVal.toString()))}>
-              <Option value="1" />
-              <Option value="5" />
-              <Option value="10" />
-              <Option value="25" />
-              <Option value="50" />
+            <Select
+              label="Steps"
+              name={steps.toString() || ''}
+              value={steps || ''}
+              onChange={newVal => setSteps(parseInt(newVal.toString()))}>
+              <Option value="1">1</Option>
+              <Option value="5">5</Option>
+              <Option value="10">10</Option>
+              <Option value="25">25</Option>
+              <Option value="50">50</Option>
             </Select>
           </div>
         </div>
@@ -380,15 +385,13 @@ const Forecast: NextPage = () => {
         {forecastSettings}
         {resultsSide}
       </div>
-      {!!notification && (
-        <Toast
-          variant={notification.type}
-          title={notification.title}
-          message={notification.message}
-          show={true}
-          onClose={() => setNotification(null)}
-        />
-      )}
+      <Toast
+        variant={notification?.type}
+        title={notification?.title}
+        message={notification?.message}
+        show={!!notification}
+        onClose={() => setNotification(null)}
+      />
       <TutorialQuickView
         variant={openTutorialModal}
         open={!!openTutorialModal}

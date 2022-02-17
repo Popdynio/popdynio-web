@@ -7,7 +7,7 @@ export type OptionProps = {
   value: string
 }
 
-const Option: React.FC<OptionProps> = ({ value }) => {
+const Option: React.FC<OptionProps> = ({ value, children }) => {
   return (
     <Listbox.Option
       className={({ active }) =>
@@ -19,7 +19,7 @@ const Option: React.FC<OptionProps> = ({ value }) => {
       value={value}>
       {({ selected, active }) => (
         <>
-          <span className={classnames(selected ? 'font-semibold' : 'font-normal', 'block truncate')}>{value}</span>
+          <span className={classnames(selected ? 'font-semibold' : 'font-normal', 'block truncate')}>{children}</span>
           {selected ? (
             <span
               className={classnames(
