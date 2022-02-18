@@ -26,9 +26,10 @@ const Toast: React.FC<ToastProps> = ({ title, variant, message, show = false, on
   }
 
   React.useEffect(() => {
-    // Close automatically after 3 seconds
+    // Close automatically after 5 seconds
     setTimeout(() => {
       onClose()
+      console.log('closing')
     }, 5000)
   }, [])
 

@@ -23,12 +23,12 @@ const DiffEquationButton: React.FC<DiffEquationButtonProps> = ({ diffEquation })
       if (factors.length === 0 || factors.length === 1) {
         N = ''
       } else if (factors.length === 2) {
-        N = `\\cdot \\frac{1}{N}`
+        N = ` \\cdot \\frac{1}{N}`
       } else {
-        N = `\\cdot \\frac{1}{N^${factors.length - 1}}`
+        N = ` \\cdot \\frac{1}{N^${factors.length - 1}}`
       }
     }
-    return `\$${alpha} $$${factors.length > 0 ? `\\cdot$$ ${factors.join(' $$\\cdot$$ ')}` : ''} ${N}\$`
+    return `\$${alpha} $$${factors.length > 0 ? ` \\cdot$$ ${factors.join(' $$\\cdot$$ ')}` : ''} ${N}\$`
   }
 
   const handleShowEquation = (group: string, inOuts) => {

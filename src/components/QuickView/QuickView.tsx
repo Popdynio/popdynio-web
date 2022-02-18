@@ -44,7 +44,7 @@ const QuickView: React.FC<QuickViewProps> = ({ open = false, onClose, title, tex
                 </button>
                 <div className="w-full">
                   <h1 className="font-bold text-4xl text-gray-700 text-center">{title}</h1>
-                  <p className="mt-20 text-center px-10">{text}</p>
+                  <div className="mt-20 text-center px-10">{text}</div>
                   <div className="flex justify-end">
                     <button
                       className="mt-20 px-10 text-white bg-green-400 hover:bg-green-600 py-4 rounded-md transition duration-200"
