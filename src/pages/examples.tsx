@@ -42,21 +42,47 @@ const ExamplesPage: NextPage = () => {
     sir: {
       title: 'SIR Model',
       request: {
-        ids: ['Susceptibles', 'Infectados', 'Recuperados'],
+        ids: ['S', 'I', 'R'],
         forecast_time: time * 10,
         transitions: [
           {
-            alpha: 0.0561215,
-            source: 'Susceptibles',
-            dest: 'Infectados',
-            factors: ['Susceptibles', 'Infectados'],
+            alpha: 0.35,
+            source: 'S',
+            dest: 'I',
+            factors: ['S', 'I'],
             includes_n: true
           },
           {
-            alpha: 0.0455331,
-            source: 'Infectados',
-            dest: 'Recuperados',
-            factors: ['Infectados'],
+            alpha: 0.035,
+            source: 'I',
+            dest: 'R',
+            factors: ['I'],
+            includes_n: false
+          }
+        ],
+        initial_population: initialPopulation,
+        method: solver,
+        cut_every: steps
+      }
+    },
+    sis: {
+      title: 'SIS Model',
+      request: {
+        ids: ['S', 'I'],
+        forecast_time: time * 10,
+        transitions: [
+          {
+            alpha: 4,
+            source: 'S',
+            dest: 'I',
+            factors: ['S', 'I'],
+            includes_n: true
+          },
+          {
+            alpha: 2,
+            source: 'I',
+            dest: 'S',
+            factors: ['I'],
             includes_n: false
           }
         ],
@@ -66,56 +92,30 @@ const ExamplesPage: NextPage = () => {
       }
     },
     seir: {
-      title: 'SEIR Model',
+      title: 'SEIR model',
       request: {
-        ids: ['S', 'I', 'R'],
+        ids: ['S', 'E', 'I', 'R'],
         forecast_time: time * 10,
         transitions: [
           {
-            alpha: 0.0561215,
+            alpha: 8.4 / 7,
             source: 'S',
             dest: 'I',
             factors: ['S', 'I'],
             includes_n: true
           },
           {
-            alpha: 0.0455331,
-            source: 'I',
-            dest: 'R',
-            factors: ['I'],
-            includes_n: false
-          }
-        ],
-        initial_population: initialPopulation,
-        method: solver,
-        cut_every: steps
-      }
-    },
-    another: {
-      title: 'Another model',
-      request: {
-        ids: ['S', 'I', 'R', 'A'],
-        forecast_time: time * 10,
-        transitions: [
-          {
-            alpha: 0.0561215,
-            source: 'S',
+            alpha: 1 / 5,
+            source: 'E',
             dest: 'I',
-            factors: ['S', 'I'],
-            includes_n: true
-          },
-          {
-            alpha: 0.0455331,
-            source: 'I',
-            dest: 'R',
-            factors: ['I'],
+            factors: ['E'],
             includes_n: false
           },
           {
-            alpha: 0.3,
-            source: 'R',
-            dest: 'A',
-            factors: [],
+            alpha: 1 / 7,
+            source: 'I',
+            dest: 'R',
+            factors: ['I'],
             includes_n: false
           }
         ],
@@ -190,8 +190,8 @@ const ExamplesPage: NextPage = () => {
       <div className="w-60">
         <Select label="" value={example} name={example} onChange={handleChangeExample}>
           <Option value="sir">sir</Option>
+          <Option value="sis">sis</Option>
           <Option value="seir">seir</Option>
-          <Option value="another">another</Option>
         </Select>
       </div>
     </div>
