@@ -39,7 +39,8 @@ const TutorialQuickView: React.FC<TutorialQuickViewProps> = ({ variant, open = f
             <strong>From</strong>) and destination (<strong>To</strong>) group.
           </li>
           <li>
-            Give a value to <strong>alpha</strong> indicating the rate of occurs the transition.
+            Give a value to <strong>alpha</strong> indicating the rate of the transition, this parameter includes the
+            probability of the transition occuring.
           </li>
           <li>
             Also, check the groups in the multiselect below to specify that the transition depends on the amount of
