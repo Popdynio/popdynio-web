@@ -35,7 +35,7 @@ const TutorialQuickView: React.FC<TutorialQuickViewProps> = ({ variant, open = f
             Click on <strong>Add transition</strong> for adding a new transition to the model.
           </li>
           <li>
-            A Transition must be defined over two models, for each transition you must select the source (
+            A Transition must be defined over two groups, for each transition you must select the source (
             <strong>From</strong>) and destination (<strong>To</strong>) group.
           </li>
           <li>
