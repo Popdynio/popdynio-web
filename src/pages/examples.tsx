@@ -124,6 +124,39 @@ const ExamplesPage: NextPage = () => {
         method: solver,
         cut_every: steps
       }
+    },
+    seis: {
+      title: 'SEIS model',
+      request: {
+        ids: ['S', 'E', 'I'],
+        forecast_time: time * 10,
+        transitions: [
+          {
+            alpha: 8.4 / 7,
+            source: 'S',
+            dest: 'E',
+            factors: ['S', 'I'],
+            includes_n: true
+          },
+          {
+            alpha: 1 / 5,
+            source: 'E',
+            dest: 'I',
+            factors: ['E'],
+            includes_n: false
+          },
+          {
+            alpha: 1 / 7,
+            source: 'I',
+            dest: 'S',
+            factors: ['I'],
+            includes_n: false
+          }
+        ],
+        initial_population: [1000, 500, 0],
+        method: solver,
+        cut_every: steps
+      }
     }
   }
   const current = exampleData[example]
@@ -215,6 +248,7 @@ const ExamplesPage: NextPage = () => {
           <Option value="sir">sir</Option>
           <Option value="sis">sis</Option>
           <Option value="seir">seir</Option>
+          <Option value="seis">seis</Option>
         </Select>
       </div>
     </div>
