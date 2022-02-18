@@ -90,7 +90,7 @@ const PopulationTransition: React.FC<PopulationTransitionProps> = props => {
             </Select>
           </div>
           <div className="w-full">
-            <Select label="Dest" name={dest || 'Empty'} value={dest || 'Empty'} onChange={onChangeDest}>
+            <Select label="To" name={dest || 'Empty'} value={dest || 'Empty'} onChange={onChangeDest}>
               {groups.map(
                 (group, i) =>
                   group !== source && (
