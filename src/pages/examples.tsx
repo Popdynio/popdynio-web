@@ -100,7 +100,7 @@ const ExamplesPage: NextPage = () => {
           {
             alpha: 8.4 / 7,
             source: 'S',
-            dest: 'I',
+            dest: 'E',
             factors: ['S', 'I'],
             includes_n: true
           },
