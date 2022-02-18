@@ -29,7 +29,6 @@ const Toast: React.FC<ToastProps> = ({ title, variant, message, show = false, on
     // Close automatically after 5 seconds
     setTimeout(() => {
       onClose()
-      console.log('closing')
     }, 5000)
   }, [])
 

@@ -30,6 +30,7 @@ const ExamplesPage: NextPage = () => {
   const [solver, setSolver] = React.useState<SolverMethod>('ODE')
   const [time, setTime] = React.useState(50)
   const [initialPopulation, setInitialPopulation] = React.useState([100, 100, 100])
+  const [transitions, setTransitions] = React.useState([])
   const [loading, setLoading] = React.useState(false)
   const [diffEquation, setDiffEquation] = React.useState(null)
   const [plotData, setPlotData] = React.useState<Object>(null)
@@ -60,7 +61,7 @@ const ExamplesPage: NextPage = () => {
             includes_n: false
           }
         ],
-        initial_population: initialPopulation,
+        initial_population: [300, 10, 0],
         method: solver,
         cut_every: steps
       }
@@ -86,7 +87,7 @@ const ExamplesPage: NextPage = () => {
             includes_n: false
           }
         ],
-        initial_population: initialPopulation,
+        initial_population: [500, 10],
         method: solver,
         cut_every: steps
       }
@@ -119,21 +120,33 @@ const ExamplesPage: NextPage = () => {
             includes_n: false
           }
         ],
-        initial_population: initialPopulation,
+        initial_population: [1000, 500, 0, 0],
         method: solver,
         cut_every: steps
       }
     }
   }
+  const current = exampleData[example]
 
   const fetchData = () => {
     setLoading(true)
+    const fixedTransitions = transitions.map(transition => {
+      console.log(transition.alpha, isNaN(transition.alpha))
+      return {
+        ...transition,
+        alpha: !isNaN(parseFloat(transition.alpha)) ? parseFloat(transition.alpha) : 0
+      }
+    })
     api
-      .forecast(exampleData[example].request)
+      .forecast({
+        ...current.request,
+        initial_population: initialPopulation,
+        transitions: fixedTransitions
+      })
       .then(response => {
         setLoading(false)
         const newDatasets = []
-        exampleData[example].request.ids.forEach((group, i) => {
+        current.request.ids.forEach((group, i) => {
           let randomColor = colors[i]
           if (!randomColor) {
             randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16)
@@ -150,7 +163,7 @@ const ExamplesPage: NextPage = () => {
         }
         if (response.data.diff_response) {
           setDiffEquation({
-            ids: exampleData[example].request.ids,
+            ids: current.request.ids,
             ...response.data.diff_response
           })
         }
@@ -159,29 +172,39 @@ const ExamplesPage: NextPage = () => {
       .catch(err => {
         setLoading(false)
         setPlotData(null)
+        console.log(err?.response?.data?.detail)
         setNotification({
           type: 'error',
           title: 'Ups!',
-          message: err?.response?.data?.detail || 'There was an error with the API'
+          message: 'There was an error with the API'
         })
         console.error(err)
       })
   }
 
-  React.useEffect(() => fetchData(), [])
-  React.useEffect(() => fetchData(), [example])
+  React.useEffect(() => {
+    setTransitions(exampleData[example].request.transitions)
+    setInitialPopulation(exampleData[example].request.initial_population)
+  }, [])
 
   const handleRun = () => fetchData()
 
   const handleChangeExample = (newVal: string | number) => {
     setExample(newVal as string)
-    setInitialPopulation(Array(exampleData[newVal].request.ids.length).fill(100))
+    setInitialPopulation(exampleData[newVal].request.initial_population)
+    setTransitions(exampleData[newVal].request.transitions)
   }
 
   const handleChangeInitialPopulation = (index: number) => (ev: React.ChangeEvent<HTMLInputElement>) => {
     const list = [...initialPopulation]
     list[index] = parseInt(ev.target.value)
     setInitialPopulation(list)
+  }
+
+  const handleChangeTransitionAlpha = (index: number) => (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const list = [...transitions]
+    list[index].alpha = ev.target.value
+    setTransitions(list)
   }
 
   const header = (
@@ -197,23 +220,57 @@ const ExamplesPage: NextPage = () => {
     </div>
   )
 
+  const initialPopulationInput = (
+    <div className="flex flex-col">
+      <h1 className="text-xl md:text-2xl font-bold text-gray-700 mb-4">Initial population</h1>
+      <div className="flex flex-col gap-2 h-56 border p-2 rounded-lg overflow-y-scroll mb-10">
+        {initialPopulation?.length > 0 &&
+          initialPopulation.map((pop, i) => (
+            <div key={`initial-population-${i}`}>
+              <label htmlFor={`initial-population-${i}`} className="text-gray-700 font-medium text-sm">
+                {current.request.ids[i]}
+              </label>
+              <input
+                className="w-2/3 shadow-sm h-8 focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md focus:outline-none font-bold text-gray-700"
+                name={`initial-population-${i}`}
+                value={pop}
+                onChange={handleChangeInitialPopulation(i)}
+                type="number"
+              />
+            </div>
+          ))}
+      </div>
+    </div>
+  )
+
+  const alphasInput = (
+    <div className="flex flex-col">
+      <h1 className="text-xl md:text-2xl font-bold text-gray-700 mb-4">Alphas</h1>
+      <div className="flex flex-col gap-2 h-56 border p-2 rounded-lg overflow-y-scroll mb-10">
+        {transitions?.length > 0 &&
+          transitions.map((transition, i) => (
+            <div key={`transition-${i}`}>
+              <label htmlFor={`transition-${i}`} className="text-gray-700 font-medium text-sm">
+                {transition.source} - {transition.dest}
+              </label>
+              <input
+                className="w-2/3 shadow-sm h-8 focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md focus:outline-none font-bold text-gray-700"
+                name={`transition-${i}`}
+                value={transition.alpha}
+                onChange={handleChangeTransitionAlpha(i)}
+                type="number"
+              />
+            </div>
+          ))}
+      </div>
+    </div>
+  )
+
   const inputFields = (
     <div className="mt-0 md:mt-20">
-      <div className="flex flex-col gap-2 h-56 border p-2 rounded-lg overflow-y-scroll mb-10">
-        {initialPopulation.map((pop, i) => (
-          <div key={`initial-population-${i}`}>
-            <label htmlFor={`initial-population-${i}`} className="text-gray-700 font-medium text-sm">
-              {exampleData[example].request.ids[i]}
-            </label>
-            <input
-              className="w-2/3 shadow-sm h-8 focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 rounded-md focus:outline-none font-bold text-gray-700"
-              name={`initial-population-${i}`}
-              value={pop}
-              onChange={handleChangeInitialPopulation(i)}
-              type="number"
-            />
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {initialPopulationInput}
+        {alphasInput}
       </div>
       <label htmlFor="range" className="font-bold text-gray-600">
         Time: {time * 10}
@@ -269,7 +326,7 @@ const ExamplesPage: NextPage = () => {
 
   const result = (
     <div className="flex flex-col gap-10">
-      <h2 className="text-2xl font-bold text-gray-700">{exampleData[example]?.title}</h2>
+      <h2 className="text-2xl font-bold text-gray-700">{current?.title}</h2>
       {loading
         ? loadingState
         : !!plotData && (
