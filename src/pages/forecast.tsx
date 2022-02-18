@@ -146,6 +146,15 @@ const Forecast: NextPage = () => {
       return () => setField(field, !transition.includesN)
     }
     if (['source', 'dest'].includes(field)) {
+      if (field === 'source') {
+        return (newVal: string | number) => {
+          setField(field, newVal)
+          const list = [...transitions]
+          const transition = list[index]
+          transition.factors = [newVal as string]
+          setTransitions(list)
+        }
+      }
       return (newVal: string | number) => setField(field, newVal)
     } else if (field === 'alpha') {
       return (ev: React.ChangeEvent<HTMLInputElement>) => setField(field, ev.target.value)
@@ -173,7 +182,9 @@ const Forecast: NextPage = () => {
     const transition = list[index]
     if (transition.factors.length > 0) {
       const foundIndex = transition.factors.findIndex(e => e === factor)
-      transition.factors.splice(foundIndex, 1)
+      if (transition.factors[foundIndex] !== transition.source) {
+        transition.factors.splice(foundIndex, 1)
+      }
     }
     setTransitions(list)
   }
