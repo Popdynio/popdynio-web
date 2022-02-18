@@ -131,16 +131,16 @@ const ExamplesPage: NextPage = () => {
   const fetchData = () => {
     setLoading(true)
     const fixedTransitions = transitions.map(transition => {
-      console.log(transition.alpha, isNaN(transition.alpha))
       return {
         ...transition,
         alpha: !isNaN(parseFloat(transition.alpha)) ? parseFloat(transition.alpha) : 0
       }
     })
+    const fixedPopulation = initialPopulation.map(pop => pop || 0)
     api
       .forecast({
         ...current.request,
-        initial_population: initialPopulation,
+        initial_population: fixedPopulation,
         transitions: fixedTransitions
       })
       .then(response => {
